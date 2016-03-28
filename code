@@ -1,0 +1,30 @@
+clc; clear;
+%%% Chose nii %%%
+[mask_name, path] = uigetfile( {'*.nii'} , 'chose mask','/home/antogeo/Dropbox/current_work/fixed'); %stema_79_95_78.nii
+mask_name = strcat(path, mask_name);
+mask_im = spm_vol(mask_name);
+Vol_mask = spm_read_vols(mask_im);
+[x, y, z] = size(Vol_mask);
+
+left_mask = zeros(x, y, z);
+right_mask = zeros(x, y, z);
+
+for i = 1 : x
+    for j = 1 : y
+        for k = 1 : z
+            if i > x/2
+                left_mask(i, j, k) = 1;
+            else 
+                right_mask(i, j, k) = 1;
+            end
+        end 
+    end
+end
+   
+right_struct =  mask_im;
+left_struct  =  mask_im;
+right_struct.fname = strcat(fileparts(mask_im.fname), '/', 'right_hem_mask.nii');
+left_struct.fname  = strcat(fileparts(mask_im.fname), '/', 'left_hem_mask.nii');
+
+spm_write_vol(right_struct, right_mask)
+spm_write_vol(left_struct, left_mask)
